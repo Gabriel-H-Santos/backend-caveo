@@ -15,7 +15,7 @@
       "@shared/*": ["shared/*"],
       "@domain/*": ["core/domain/*"],
       "@entities/*": ["core/domain/entities/*"],
-      "@env/*": ["config/env/*"],
+      "@env/*": ["config/env/*"]
     }
   },
   "include": ["src/**/*", "__test__"],
