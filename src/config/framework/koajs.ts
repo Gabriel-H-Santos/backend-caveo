@@ -18,7 +18,7 @@ Object.keys(routes).forEach(key => {
 
 const app = new Koa();
 app.use(bodyParser());
-app.use(cors({ maxAge: 3600 }));
+app.use(cors({ maxAge: 86400 }));
 
 app.use(router.routes()).use(router.allowedMethods());
 
