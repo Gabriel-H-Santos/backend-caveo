@@ -3,9 +3,10 @@ import { User } from '@domain/entities/user.entity';
 import { PostgresConnection } from '@config/databases/postgres';
 import { Service } from 'typedi';
 import { errorLog } from '@shared/utils/loggerFormat';
+import { IUserRepository } from '@core/domain/interfaces/user.interface';
 
 @Service()
-export class UserRepository {
+export class UserRepository implements IUserRepository {
   private readonly repository: Repository<User>;
 
   constructor(private readonly connection: PostgresConnection) {

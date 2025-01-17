@@ -67,11 +67,11 @@ export class UserController {
   public async signInOrRegister(ctx: Context): Promise<void> {
     try {
       const { email, name } = ctx.request.body as IUserBodyDto;
-      const { user, registerToken } = await this.signInOrRegisterUseCase.execute({ email, name });
+      const { user, message, registerToken } = await this.signInOrRegisterUseCase.execute({ email, name });
 
       const response = new UserResponseDto(user);
 
-      ctx.body = { message: 'Sign in or register successful', registerToken, response };
+      ctx.body = { message, registerToken, response };
     } catch (error) {
       const msg = 'Error during sign in or registration';
       ctx.status = StatusCodes.INTERNAL_SERVER_ERROR;

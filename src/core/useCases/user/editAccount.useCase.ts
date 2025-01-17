@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { UserRepository } from '@core/infrastructure/repositories/user.repository';
 import { User } from '@core/domain/entities/user.entity';
 import { ForbiddenException, NotFoundException } from '@shared/exceptions';
+import { Roles } from '@core/domain/enums/roles';
 
 interface EditAccountInput {
   userId: string;
@@ -17,7 +18,7 @@ export class EditAccountUseCase {
   public async execute(input: EditAccountInput): Promise<User> {
     const { userId, name, newRole, role } = input;
 
-    if (role !== 'admin' && newRole) {
+    if (role !== Roles.ADMIN && newRole) {
       throw new ForbiddenException();
     }
 
@@ -32,7 +33,7 @@ export class EditAccountUseCase {
       user.isOnboarded = true;
     }
 
-    if (newRole && role === 'admin') {
+    if (newRole && role === Roles.ADMIN) {
       user.role = newRole;
     }
 

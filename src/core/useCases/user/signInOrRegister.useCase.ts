@@ -4,37 +4,44 @@ import { UserRepository } from '@core/infrastructure/repositories/user.repositor
 import { errorLog } from '@shared/utils/loggerFormat';
 import { Service } from 'typedi';
 import { generateToken } from '@config/auth/jwt';
+import { BadRequestException, InternalServerErrorException } from '@shared/exceptions';
+import { Roles } from '@core/domain/enums/roles';
 
 @Service()
 export class SignInOrRegisterUseCase {
   constructor(
     private readonly userRepository: UserRepository
-  ) {}
+  ) { }
 
-  public async execute(input: IUserBodyDto): Promise<{ user: User; registerToken: string | null }> {
+  public async execute(input: IUserBodyDto): Promise<{ user: User; message: string, registerToken?: string | null }> {
     const { email, name } = input;
+
+    if (!email || !name) {
+      throw new BadRequestException('Email and name are required');
+    }
 
     try {
       let user = await this.userRepository.findByEmail(email);
-      let registerToken = null;
+      let registerToken;
 
       if (!user) {
-        user = new User({ email, name, role: 'user' })
+        user = new User({ email, name, role: Roles.USER })
         await this.userRepository.save(user);
 
         registerToken = generateToken({
           id: user.uuid,
           email: user.email,
-          // role: user.role,
-          role: 'admin',
+          role: user.role,
         });
+
+        return { user, message: 'Register successful, save your token', registerToken };
       }
 
-      return { user, registerToken };
+      return { user, message: 'Sign in successful' };
     } catch (error) {
       const msg = 'Error during sign in or registration';
       errorLog({ msg, error });
-      throw new Error(msg);
+      throw new InternalServerErrorException(msg);
     }
   }
 }

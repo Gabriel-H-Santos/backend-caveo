@@ -3,7 +3,7 @@ import bodyParser from 'koa-bodyparser';
 import Router from '@koa/router';
 import cors from '@koa/cors';
 import routesFile from '@app/routes';
-import { Route } from '@shared/enums/routes';
+import { Route } from '@core/domain/enums/routes';
 
 type RoutesFile = {
   [key: string]: Router;
