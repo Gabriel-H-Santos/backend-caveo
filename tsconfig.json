@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@config/*": ["config/*"],
+      "@core/*": ["core/*"],
+      "@shared/*": ["shared/*"],
+      "@domain/*": ["core/domain/*"],
+      "@entities/*": ["core/domain/entities/*"],
+      "@services/*": ["core/services/*"],
+      "@env/*": ["config/env/*"],
+      "@integrations/*": ["shared/integrations/*"]
+    }
+  },
+  "include": ["src/**/*", "__test__"],
+  "exclude": ["node_modules/**/*", ".vscode/**/*"]
+}
+  
