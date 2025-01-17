@@ -38,4 +38,13 @@ export class UserRepository {
       throw error;
     }
   }
+
+  public async findByUuid(uuid: string): Promise<User | null> {
+    try {
+      return await this.repository.findOne({ where: { uuid } });
+    } catch (error) {
+      errorLog({ msg: 'Error in UserRepository.findByUuid', error });
+      throw error;
+    }
+  }
 }
