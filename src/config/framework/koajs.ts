@@ -1,9 +1,9 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import Router from '@koa/router';
-import cors from 'koa-cors';
-import routesFile from '@app/routes'
-import { Route } from '@shared/enums/routes'
+import cors from '@koa/cors';
+import routesFile from '@app/routes';
+import { Route } from '@shared/enums/routes';
 
 type RoutesFile = {
   [key: string]: Router;
@@ -18,8 +18,8 @@ Object.keys(routes).forEach(key => {
 
 const app = new Koa();
 app.use(bodyParser());
-app.use(cors({ maxAge: 86400 }));
+app.use(cors({ maxAge: 3600 }));
 
 app.use(router.routes()).use(router.allowedMethods());
 
-export { app }
+export { app };
