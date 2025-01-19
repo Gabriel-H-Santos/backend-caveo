@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({
   path: `.env.${process.env.NODE_ENV || 'development'}`,
 })
-import { TEnvironmentConfig } from './types';
+import { TEnvironmentConfig } from './types/environment-config.type';
 
 export const env: TEnvironmentConfig = {
   api: {
@@ -27,15 +27,14 @@ export const env: TEnvironmentConfig = {
       server: process.env.SWAGGER_SERVER as string,
     },
   },
-  jwt: {
-    secret: process.env.JWT_SECRET as string,
-    expiration: process.env.JWT_EXPIRATION as string || '1h',
-  },
-  awsCognito: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
-    region: process.env.AWS_REGION as string,
-    userPoolId: process.env.AWS_COGNITO_USER_POOL_ID as string,
-    appClientId: process.env.AWS_COGNITO_APP_CLIENT_ID as string,
-  },
+  auth: {
+    awsCognito: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+      region: process.env.AWS_REGION as string,
+      userPoolId: process.env.AWS_COGNITO_USER_POOL_ID as string,
+      appClientId: process.env.AWS_COGNITO_APP_CLIENT_ID as string,
+      appClientSecret: process.env.AWS_COGNITO_APP_CLIENT_SECRET as string,
+    },
+  }
 };
