@@ -1,11 +1,11 @@
 export interface IUserBodyDto {
-  name: string;
   email: string;
+  password: string;
 }
 
 interface IUserDto {
   id: number;
-  uuid: string;
+  externalId: string;
   name: string;
   email: string;
   isOnboarded: boolean;
@@ -27,7 +27,7 @@ export class UserResponseDto {
 
   constructor(data: Partial<IUserDto>
   ) {
-    this.id = data.uuid!;
+    this.id = data.externalId!;
     this.name = data.name!;
     this.email = data.email!;
     this.isOnboarded = data.isOnboarded!;

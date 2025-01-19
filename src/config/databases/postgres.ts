@@ -7,7 +7,7 @@ import { DataSource } from 'typeorm';
 import { Service } from 'typedi';
 import { env } from '@env/map-env-to-configuration';
 import { User } from '@core/domain/entities/user.entity';
-import { IDatabase } from '@core/domain/interfaces/database.interface';
+import { IDatabase } from '@config/interfaces/database.interface';
 import { infoLog, errorLog } from '@shared/utils/loggerFormat';
 
 const basePath = path.join(__dirname, '@core/infrastructure', 'migrations/**/*{.ts,.js}');

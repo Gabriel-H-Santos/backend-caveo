@@ -4,4 +4,5 @@ export type TEnvironmentAWSCognitoConfig = {
   region: string;
   userPoolId: string;
   appClientId: string;
+  appClientSecret: string;
 };

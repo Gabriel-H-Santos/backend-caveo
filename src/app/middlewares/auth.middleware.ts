@@ -1,33 +1,28 @@
 import { Context, Next } from 'koa';
 import { UnauthorizedException, ForbiddenException } from '@shared/exceptions';
-import { decodeToken } from '@config/auth/jwt';
+import { verifyCognitoToken } from '@config/auth/awsCognito';
 
 export const authMiddleware = (requiredRole?: string) => {
   return async (ctx: Context, next: Next) => {
     const authHeader = ctx.headers.authorization;
 
-    if (!authHeader) {
+    if (!authHeader)
       throw new UnauthorizedException('Authorization header is missing');
-    }
 
     const [, token] = authHeader.split(' ');
 
-    if (!token) {
+    if (!token) 
       throw new UnauthorizedException('Token is missing');
-    }
 
     try {
-      const decoded = decodeToken(token);
+      const user = await verifyCognitoToken(token);
 
-      ctx.state.user = {
-        id: decoded.id,
-        email: decoded.email,
-        role: decoded.role,
-      };
+      if (!user) throw new UnauthorizedException('Invalid token');
 
-      if (requiredRole && ctx.state.user.role !== requiredRole) {
+      ctx.state.user = user;
+
+      if (requiredRole && ctx.state.user.role !== requiredRole)
         throw new ForbiddenException();
-      }
 
       await next();
     } catch (error) {

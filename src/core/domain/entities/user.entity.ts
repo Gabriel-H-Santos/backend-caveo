@@ -1,10 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { Roles } from '../enums/roles';
 
 interface UserProps {
   email: string;
-  name: string;
-  role: string;
+  name?: string;
+  role: Roles;
   isOnboarded?: boolean;
 }
 
@@ -13,7 +14,6 @@ class User {
   constructor(props: UserProps) {
     if (props) {
       this.email = props.email;
-      this.name = props.name;
       this.role = props.role;
       this.isOnboarded = props.isOnboarded || false;
     }
@@ -22,20 +22,20 @@ class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ name: 'uuid' })
-  uuid: string = uuidv4();
+  @Column({ name: 'external_id', unique: true })
+  externalId: string = uuidv4();
 
   @Column()
-  name!: string;
+  name?: string;
 
-  @Column()
+  @Column({ unique: true })
   email!: string;
 
   @Column({ name: 'is_onboarded' })
   isOnboarded!: boolean;
 
-  @Column()
-  role!: string;
+  @Column({  type: 'enum', enum: Roles })
+  role!: Roles;
 
   @Column({ default: () => 'CURRENT_TIMESTAMP', name: 'created_at' })
   createdAt!: Date;

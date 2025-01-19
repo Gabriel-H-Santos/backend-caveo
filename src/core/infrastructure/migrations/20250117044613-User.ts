@@ -14,12 +14,13 @@ export class User20250117044613 implements MigrationInterface {
             generationStrategy: 'increment'
           },
           {
-            name: 'uuid',
+            name: 'external_id',
             type: 'varchar',
           },
           {
             name: 'name',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'email',

@@ -1,47 +1,62 @@
 import { IUserBodyDto } from '@core/domain/dtos/user.dto';
 import { User } from '@core/domain/entities/user.entity';
 import { UserRepository } from '@core/infrastructure/repositories/user.repository';
-import { errorLog } from '@shared/utils/loggerFormat';
 import { Service } from 'typedi';
-import { generateToken } from '@config/auth/jwt';
-import { BadRequestException, InternalServerErrorException } from '@shared/exceptions';
+import { BadRequestException } from '@shared/exceptions';
 import { Roles } from '@core/domain/enums/roles';
+import { getToken, createUser } from '@config/auth/awsCognito';
 
 @Service()
 export class SignInOrRegisterUseCase {
   constructor(
     private readonly userRepository: UserRepository
-  ) { }
+  ) {}
 
-  public async execute(input: IUserBodyDto): Promise<{ user: User; message: string, registerToken?: string | null }> {
-    const { email, name } = input;
+  public async execute(input: IUserBodyDto): Promise<{ user: User; message: string; token: string }> {
+    const { email, password } = input;
 
-    if (!email || !name) {
-      throw new BadRequestException('Email and name are required');
+    this.validateSignInOrRegisterInput(email, password);
+
+    let user = await this.userRepository.findByEmail(email);
+    let token;
+
+    if (!user) {
+      const initialRole = Roles.USER;
+
+      user = new User({ email, role: initialRole });
+      await this.userRepository.save(user);
+
+      await createUser({
+        externalId: user.externalId,
+        email,
+        role: initialRole,
+      }, password)
+
+      token = await getToken(user.externalId, password);
+
+      return { user, message: 'Register successful, save your token', token };
     }
 
-    try {
-      let user = await this.userRepository.findByEmail(email);
-      let registerToken;
+    token = await getToken(user.externalId, password);
 
-      if (!user) {
-        user = new User({ email, name, role: Roles.USER })
-        await this.userRepository.save(user);
+    return { user, message: 'Sign in successful, save your token', token };
+  }
 
-        registerToken = generateToken({
-          id: user.uuid,
-          email: user.email,
-          role: user.role,
-        });
+  private validateSignInOrRegisterInput(email: string, password: string): void {
+    if (!email || !password)
+      throw new BadRequestException('Email and Password are required!');
 
-        return { user, message: 'Register successful, save your token', registerToken };
-      }
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      throw new BadRequestException('Email and Password must be strings!');
+    }
 
-      return { user, message: 'Sign in successful' };
-    } catch (error) {
-      const msg = 'Error during sign in or registration';
-      errorLog({ msg, error });
-      throw new InternalServerErrorException(msg);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new BadRequestException('Email must be a valid email address!');
+    }
+
+    if (password.length < 6 || password.length > 20) {
+      throw new BadRequestException('Password must be between 6 and 20 characters long!');
     }
   }
 }

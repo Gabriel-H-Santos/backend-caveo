@@ -1,9 +1,9 @@
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { User } from '@domain/entities/user.entity';
 import { PostgresConnection } from '@config/databases/postgres';
 import { Service } from 'typedi';
 import { errorLog } from '@shared/utils/loggerFormat';
-import { IUserRepository } from '@core/domain/interfaces/user.interface';
+import { IUserRepository } from '@core/infrastructure/interfaces/userRepository.interface';
 
 @Service()
 export class UserRepository implements IUserRepository {
@@ -40,11 +40,11 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  public async findByUuid(uuid: string): Promise<User | null> {
+  public async update(user: User): Promise<UpdateResult> {
     try {
-      return await this.repository.findOne({ where: { uuid } });
+      return await this.repository.update({ id: user.id }, user);
     } catch (error) {
-      errorLog({ msg: 'Error in UserRepository.findByUuid', error });
+      errorLog({ msg: 'Error in UserRepository.update', error });
       throw error;
     }
   }
