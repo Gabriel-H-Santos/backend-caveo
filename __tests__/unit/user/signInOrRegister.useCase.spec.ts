@@ -64,6 +64,15 @@ describe('SignInOrRegisterUseCase', () => {
     await expect(useCase.execute(mockInput2)).rejects.toThrow('Email and Password are required!');
   });
 
+  it('should throw BadRequestException if email or password are not strings', () => {
+    expect(() => {
+      (useCase as any).validateSignInOrRegisterInput(123 as any, 'validPassword');
+    }).toThrow('Email and Password must be strings!');
+    expect(() => {
+      (useCase as any).validateSignInOrRegisterInput('validEmail@example.com', 123 as any);
+    }).toThrow('Email and Password must be strings!');
+  });
+
   it('should throw an error for passwords shorter than 6 characters', async () => {
     const mockInput = { email: 'user@example.com', password: '12345' };
 
@@ -72,7 +81,7 @@ describe('SignInOrRegisterUseCase', () => {
 
   it('should handle repository save errors gracefully', async () => {
     const mockInput = { email: 'newuser@example.com', password: 'password123' };
-    
+
     mockUserRepository.findByEmail.mockResolvedValue(null);
     mockUserRepository.save.mockImplementation(() => {
       throw new Error('Database error');
