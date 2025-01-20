@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { UserRepository } from '@core/infrastructure/repositories/user.repository';
 import { ForbiddenException, NotFoundException, UnprocessableEntityException } from '@shared/exceptions';
 import { Roles } from '@core/domain/enums/roles';
-import { updateCognitoUser } from '@config/auth/awsCognito';
+import { AwsCognitoUseCase } from '@core/useCases/auth/awsCognito.useCase';
 import { User } from '@core/domain/entities/user.entity';
 
 interface EditAccountInput {
@@ -14,10 +14,13 @@ interface EditAccountInput {
 
 @Service()
 export class EditAccountUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly awsCognitoUseCase: AwsCognitoUseCase,
+  ) {}
 
   public async execute(input: EditAccountInput): Promise<void> {
-    const { email, name, newRole, role } = input;
+    const { email, name, newRole } = input;
 
     let user = await this.userRepository.findByEmail(email);
 
@@ -36,7 +39,7 @@ export class EditAccountUseCase {
 
     await this.userRepository.update(user);
 
-    await updateCognitoUser({ name: user.name, externalId: user.externalId, role: user.role });
+    await this.awsCognitoUseCase.updateCognitoUser({ name: user.name, externalId: user.externalId, role: user.role });
   }
 
   private validateUpdateUserInput(newRole?: string, name?: string, user?: User | null): void {

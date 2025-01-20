@@ -1,6 +1,8 @@
 import { Context, Next } from 'koa';
 import { UnauthorizedException, ForbiddenException } from '@shared/exceptions';
-import { verifyCognitoToken } from '@config/auth/awsCognito';
+import { AwsCognitoUseCase } from '@core/useCases/auth/awsCognito.useCase';
+
+const awsCognitoUseCase = new AwsCognitoUseCase();
 
 export const authMiddleware = (requiredRole?: string) => {
   return async (ctx: Context, next: Next) => {
@@ -15,7 +17,7 @@ export const authMiddleware = (requiredRole?: string) => {
       throw new UnauthorizedException('Token is missing');
 
     try {
-      const user = await verifyCognitoToken(token);
+      const user = await awsCognitoUseCase.verifyCognitoToken(token);
 
       if (!user) throw new UnauthorizedException('Invalid token');
 

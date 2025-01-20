@@ -6,6 +6,7 @@ import { GetMeUseCase } from '@core/useCases/user/getMe.useCase';
 import { EditAccountUseCase } from '@core/useCases/user/editAccount.useCase';
 import { SignInOrRegisterUseCase } from '@core/useCases/user/signInOrRegister.useCase';
 import { IUserBodyDto, UserResponseDto } from '@core/domain/dtos/user.dto';
+import { errorLog } from '@shared/utils/loggerFormat';
 
 @Service()
 export class UserController {
@@ -42,7 +43,7 @@ export class UserController {
       ctx.body = { user };
     } catch (error: any) {
       const msg = error.message || 'Error fetching user data';
-
+      errorLog({ msg, error });
       ctx.status = error.status || StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = { message: msg };
     }

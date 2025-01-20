@@ -4,12 +4,13 @@ import { UserRepository } from '@core/infrastructure/repositories/user.repositor
 import { Service } from 'typedi';
 import { BadRequestException } from '@shared/exceptions';
 import { Roles } from '@core/domain/enums/roles';
-import { getToken, createUser } from '@config/auth/awsCognito';
+import { AwsCognitoUseCase } from '@core/useCases/auth/awsCognito.useCase';
 
 @Service()
 export class SignInOrRegisterUseCase {
   constructor(
-    private readonly userRepository: UserRepository
+    private readonly userRepository: UserRepository,
+    private readonly awsCognitoUseCase: AwsCognitoUseCase,
   ) {}
 
   public async execute(input: IUserBodyDto): Promise<{ user: User; message: string; token: string }> {
@@ -26,18 +27,18 @@ export class SignInOrRegisterUseCase {
       user = new User({ email, role: initialRole });
       await this.userRepository.save(user);
 
-      await createUser({
+      await this.awsCognitoUseCase.createUser({
         externalId: user.externalId,
         email,
         role: initialRole,
       }, password)
 
-      token = await getToken(user.externalId, password);
+      token = await this.awsCognitoUseCase.getToken(user.externalId, password);
 
       return { user, message: 'Register successful, save your token', token };
     }
 
-    token = await getToken(user.externalId, password);
+    token = await this.awsCognitoUseCase.getToken(user.externalId, password);
 
     return { user, message: 'Sign in successful, save your token', token };
   }
