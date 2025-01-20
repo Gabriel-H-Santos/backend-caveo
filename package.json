@@ -7,14 +7,16 @@
     "infra:db": "docker-compose up -d",
     "infra:down": "docker-compose down --remove-orphans --volumes",
     "migration:run": "npm run typeorm migration:run -- -d ./ormconfig.ts",
-    "seed": "ts-node -r tsconfig-paths/register src/core/infrastructure/seeders/index.ts",
     "start": "node -r tsconfig-paths/register -r ts-node/register ./src/main.ts",
     "start:dev": "nodemon src/main.ts",
     "build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s ./src -o ./lib",
     "lint:staged": "lint-staged",
-    "test": "jest --runInBand",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "version": "tsc -v"
+    "test": "cross-env NODE_ENV=test jest",
+    "test:unit": "cross-env NODE_ENV=test jest --testPathPattern=unit",
+    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:cov": "cross-env NODE_ENV=test jest --coverage",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "repository": {
     "type": "git",
