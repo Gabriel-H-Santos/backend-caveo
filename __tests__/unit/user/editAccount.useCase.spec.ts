@@ -1,7 +1,7 @@
 import { EditAccountUseCase } from '../../../src/core/useCases/user/editAccount.useCase';
 import { UserRepository } from '../../../src/core/infrastructure/repositories/user.repository';
 import { AwsCognitoUseCase } from '../../../src/core/useCases/auth/awsCognito.useCase';
-import { NotFoundException, UnprocessableEntityException } from '../../../src/shared/exceptions';
+import { ForbiddenException, NotFoundException } from '../../../src/shared/exceptions';
 import { Roles } from '../../../src/core/domain/enums/roles';
 
 const mockUserRepository = {
@@ -87,5 +87,19 @@ describe('EditAccountUseCase', () => {
 
     await expect(useCase.execute(input)).rejects.toThrow('Database error');
     expect(mockAwsCognitoUseCase.updateCognitoUser).not.toHaveBeenCalled();
+  });
+
+  it('should throw ForbiddenException if a non-admin user tries to change role', () => {
+    const user = { role: Roles.USER };
+    expect(() => {
+      (useCase as any).validateUpdateUserInput('ADMIN', 'Valid Name', user);
+    }).toThrow(ForbiddenException);
+  });
+
+  it('should throw UnprocessableEntityException if newRole is invalid', () => {
+    const user = { role: Roles.ADMIN };
+    expect(() => {
+      (useCase as any).validateUpdateUserInput('INVALID_ROLE', 'Valid Name', user);
+    }).toThrow('Invalid role!');
   });
 });
