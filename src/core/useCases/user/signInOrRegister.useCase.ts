@@ -53,7 +53,7 @@ export class SignInOrRegisterUseCase {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      throw new BadRequestException('Email must be a valid email address!');
+      throw new BadRequestException('Invalid email format!');
     }
 
     if (password.length < 6 || password.length > 20) {
